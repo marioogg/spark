@@ -4,9 +4,9 @@ plugins {
     id 'maven-publish'
 }
 
-tasks.withType(JavaCompile) {
-    // override, compile targeting J21
-    options.release = 21
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
 }
 
 tasks.jar {
@@ -20,6 +20,7 @@ dependencies {
 
 repositories {
     maven { url "https://repo.papermc.io/repository/maven-public/" }
+    maven { url "https://jitpack.io" }
 }
 
 blossom {
@@ -43,7 +44,6 @@ shadowJar {
     relocate 'me.lucko.bytesocks.client', 'me.lucko.spark.paper.lib.bytesocks'
     relocate 'org.java_websocket', 'me.lucko.spark.paper.lib.bytesocks.ws'
 
-    // nest common classes beneath the paper package to avoid conflicts with spark-bukkit
     relocate 'me.lucko.spark.common', 'me.lucko.spark.paper.common'
     relocate 'me.lucko.spark.proto', 'me.lucko.spark.paper.proto'
     relocate 'spark-native', 'spark-paper-native'
@@ -57,15 +57,6 @@ artifacts {
 }
 
 publishing {
-    //repositories {
-    //    maven {
-    //        url = 'https://artifactory.papermc.io/artifactory/releases'
-    //        credentials {
-    //            username = paperArtifactoryUsername
-    //            password = paperArtifactoryPassword
-    //        }
-    //    }
-    //}
     publications {
         shadow(MavenPublication) { publication ->
             project.shadow.component(publication)

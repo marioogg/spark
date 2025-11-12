@@ -16,6 +16,7 @@ subprojects {
     apply plugin: 'idea'
     apply plugin: 'java-library'
     apply plugin: 'org.cadixdev.licenser'
+    apply plugin: 'maven-publish'
 
     ext {
         baseVersion = '1.10'
@@ -29,19 +30,21 @@ subprojects {
             jarTask.exclude 'META-INF/proguard/**'
             jarTask.exclude 'META-INF/LICENSE'
             jarTask.exclude 'META-INF/NOTICE'
-            // protobuf
             jarTask.exclude '**/*.proto'
             jarTask.exclude '**/*.proto.bin'
-            // async-profiler
             jarTask.exclude 'linux-arm64/**'
             jarTask.exclude 'linux-x64/**'
             jarTask.exclude 'macos/**'
         }
     }
 
+    java {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+
     tasks.withType(JavaCompile).configureEach {
         options.encoding = 'UTF-8'
-        options.release = 8
     }
 
     tasks.withType(Test).configureEach {
@@ -64,33 +67,12 @@ subprojects {
     }
 
     repositories {
-        // Fix issue with lwjgl-freetype not being found on macOS / ForgeGradle issue
-        //
-        // Could not resolve all files for configuration ':_compileJava_1'.
-        // Could not find lwjgl-freetype-3.3.3-natives-macos-patch.jar (org.lwjgl:lwjgl-freetype:3.3.3).
-        maven {
-            url "https://libraries.minecraft.net"
-            content {
-                includeModule("org.lwjgl", "lwjgl-freetype")
-            }
-        }
+        maven { url "https://libraries.minecraft.net" }
         mavenCentral()
-        //maven { url "https://central.sonatype.com/repository/maven-snapshots/" }
         maven { url "https://repo.lucko.me/" }
         maven { url "https://jitpack.io" }
     }
 
-}
-
-def determinePatchVersion() {
-    return '0'
-}
-
-// --- Added for JitPack publishing ---
-allprojects {
-    apply plugin: 'maven-publish'
-
-    // Only publish submodules with actual code (not all)
     afterEvaluate { project ->
         if (project.plugins.hasPlugin('java')) {
             project.publishing {
@@ -107,4 +89,8 @@ allprojects {
             }
         }
     }
+}
+
+def determinePatchVersion() {
+    return '0'
 }
