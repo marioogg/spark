@@ -1,0 +1,7 @@
+# jitpack.yml
+jdk:
+  - openjdk21
+
+# Opcional: puedes definir tareas específicas si tu build necesita algo distinto
+install:
+  - ./gradlew clean build -x test
