@@ -84,12 +84,28 @@ subprojects {
 }
 
 def determinePatchVersion() {
-    def tagInfo = new ByteArrayOutputStream()
-    exec {
-        commandLine 'git', 'describe', '--tags'
-        standardOutput = tagInfo
-    }
-    tagInfo = tagInfo.toString()
+    return '0'
+}
 
-    return tagInfo.contains('-') ? tagInfo.split("-")[1] : 0
+// --- Added for JitPack publishing ---
+allprojects {
+    apply plugin: 'maven-publish'
+
+    // Only publish submodules with actual code (not all)
+    afterEvaluate { project ->
+        if (project.plugins.hasPlugin('java')) {
+            project.publishing {
+                publications {
+                    mavenJava(MavenPublication) {
+                        from components.java
+                        pom {
+                            name = 'spark'
+                            description = 'spark is a performance profiling plugin/mod for Minecraft clients, servers and proxies.'
+                            url = 'https://spark.lucko.me/'
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
